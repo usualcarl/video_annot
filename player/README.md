@@ -42,7 +42,7 @@ pip install PyQt5
 
 Run the application:
 ```bash
-python main.py
+python annot_player_uni.py
 ```
 
 In the opened window:
