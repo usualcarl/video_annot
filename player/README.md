@@ -1,85 +1,85 @@
 
-# 📼 Video Annotator
+# Video Annotator
 
 **PyQt5 Video Annotation Tool**
 
-Этот проект — это удобный инструмент для разметки видео с помощью интерфейса на PyQt5 и модуля QtMultimedia.  
-Он позволяет просматривать видеофайлы, задавать статус каждой сессии (например, `attack`, `need_revision`, `real`, `virtual_camera`), и сохранять результаты обратно в CSV-файл.
+This project is a handy tool for annotating videos using a PyQt5 interface and QtMultimedia module.  
+It allows you to browse video files, assign a status to each session (e.g., `attack`, `need_revision`, `real`, `virtual_camera`), and save the results back into a CSV file.
 
 ---
 
-## 🚀 Основные возможности
+## Main Features
 
-✅ Поддержка CSV сессий  
-✅ Поддержка фильтрации по статусу  
-✅ Горячие клавиши для быстрой аннотации  
-✅ Перемотка и выбор скорости воспроизведения  
-✅ Поддержка циклического воспроизведения (Loop)  
-✅ Ввод причины для некоторых статусов  
-✅ Навигация по `session_id`
+CSV session support  
+Status filtering  
+Hotkeys for quick annotation  
+Seek bar and playback speed adjustment  
+Loop playback support  
+Reason input for specific statuses  
+Jump directly to a `session_id`
 
 ---
 
-## ⚙️ Установка
+## Installation
 
-1️⃣ Убедитесь, что у вас установлен Python 3.9+  
-2️⃣ Установите зависимости:
+Make sure you have Python 3.9+ installed  
+Install dependencies:
 ```bash
 pip install PyQt5
 ```
 
 ---
 
-## 🏗 Структура проекта
+## Project Structure
 
-- **main.py** — основной исполняемый файл
-- **csv файл** — список сессий и статусов
-- **папка с видео** — должны содержать файлы с именами вида `<session_id>__alt_video.mp4`
+- **main.py** — main executable file  
+- **CSV file** — list of sessions and statuses  
+- **video folder** — should contain files named `<session_id>__alt_video.mp4`
 
 ---
 
-## 💡 Использование
+## Usage
 
-1️⃣ Запустите приложение:
+Run the application:
 ```bash
 python main.py
 ```
 
-2️⃣ В открывшемся окне:
-- выберите CSV-файл  
-- выберите папку с видео  
+In the opened window:
+- select the CSV file  
+- select the folder with videos  
 
-3️⃣ Начните аннотировать:
-- клавиши **1-4** → проставляют статусы (`attack`, `need_revision`, `real`, `virtual_camera`)  
-- кнопки **Previous/Next** → навигация между видео  
-- **L** → переключение цикла  
-- **Пробел** → пауза/воспроизведение  
-- **[ / ]** → уменьшить/увеличить скорость  
-- поле ввода → перейти по конкретному `session_id`
+Start annotating:
+- keys **1-4** → assign statuses (`attack`, `need_revision`, `real`, `virtual_camera`)  
+- **Previous/Next** buttons → navigate between videos  
+- **L** → toggle loop playback  
+- **Spacebar** → play/pause  
+- **[ / ]** → decrease/increase speed  
+- input field → jump to a specific `session_id`
 
-Все изменения автоматически сохраняются в выбранный CSV.
-
----
-
-## ⌨ Горячие клавиши
-
-| Клавиша            | Действие                         |
-|---------------------|----------------------------------|
-| 1                  | Присвоить статус `attack`        |
-| 2                  | Присвоить статус `need_revision`|
-| 3                  | Присвоить статус `real`         |
-| 4                  | Присвоить статус `virtual_camera` |
-| Backspace / ← / ↑  | Предыдущее видео                |
-| → / ↓             | Следующее видео                  |
-| L                 | Включить/выключить цикл (loop)   |
-| Пробел            | Пауза/возобновить видео          |
-| [ / ]             | Изменить скорость воспроизведения|
+All changes are automatically saved back to the selected CSV file.
 
 ---
 
-## 🗃 CSV-формат
+## Hotkeys
 
-Ожидается, что CSV-файл содержит как минимум следующие колонки:
+| Key                  | Action                               |
+|----------------------|-------------------------------------|
+| 1                   | Set status `attack`                 |
+| 2                   | Set status `need_revision`          |
+| 3                   | Set status `real`                  |
+| 4                   | Set status `virtual_camera`        |
+| Backspace / ← / ↑   | Previous video                     |
+| → / ↓              | Next video                          |
+| L                  | Toggle loop mode                    |
+| Spacebar           | Pause/resume video                  |
+| [ / ]              | Adjust playback speed               |
+
+---
+
+## CSV Format
+
+The CSV file is expected to have at least the following columns:
 - `session_id`
 - `person_id`
 - `status`
