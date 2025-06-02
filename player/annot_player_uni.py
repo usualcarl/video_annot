@@ -71,6 +71,11 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.info_label = QtWidgets.QLabel(self)
         self.main_layout.addWidget(self.info_label)
 
+        self.jump_number_input = QtWidgets.QLineEdit(self)
+        self.jump_number_input.setPlaceholderText("Enter video number to jump to video(1-based index)")
+        self.jump_number_input.setFocusPolicy(QtCore.Qt.ClickFocus)
+        self.jump_number_input.returnPressed.connect(self.jump_to_video_number)
+        self.main_layout.addWidget(self.jump_number_input)
         self.jump_input = QtWidgets.QLineEdit(self)
         self.jump_input.setPlaceholderText("Enter session_id to jump to video")
         self.jump_input.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -265,6 +270,23 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         QtWidgets.QMessageBox.warning(self, "Not Found", f"Session ID {session_id} not found.")
         self.jump_input.clearFocus()
 
+    def jump_to_video_number(self):
+        text = self.jump_number_input.text().strip()
+        if not text.isdigit():
+            QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid number.")
+            self.jump_number_input.clearFocus()
+            return
+
+        number = int(text)
+        if number < 1 or number > len(self.filtered_indices):
+            QtWidgets.QMessageBox.warning(self, "Out of Range", f"Please enter a number between 1 and {len(self.filtered_indices)}.")
+            self.jump_number_input.clearFocus()
+            return
+
+        self.current_index = number - 1  
+        self.play_current_video()
+        self.jump_number_input.clearFocus()    
+    
     def duration_changed(self, duration):
         self.slider.setRange(0, duration)
 
