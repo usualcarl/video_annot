@@ -11,11 +11,26 @@ STATUSES = {
     QtCore.Qt.Key_4: "virtual_camera",
 }
 
-class VideoWidget(QtMultimediaWidgets.QVideoWidget):
+class GraphicsVideoWidget(QtWidgets.QGraphicsView):
     def __init__(self, parent=None):
         super().__init__(parent)
-        self.setSizePolicy(QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Expanding)
-        self.setAspectRatioMode(QtCore.Qt.KeepAspectRatio)
+        self.setStyleSheet("background-color: white; border: none;")
+        self.setAlignment(QtCore.Qt.AlignCenter)
+
+        self.scene = QtWidgets.QGraphicsScene(self)
+        self.setScene(self.scene)
+
+        self.video_item = QtMultimediaWidgets.QGraphicsVideoItem()
+        self.video_item.setAspectRatioMode(QtCore.Qt.KeepAspectRatio)
+        self.scene.addItem(self.video_item)
+
+        self.setRenderHint(QtGui.QPainter.Antialiasing)
+        self.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+
+    def resizeEvent(self, event):
+        super().resizeEvent(event)
+        self.fitInView(self.video_item, QtCore.Qt.KeepAspectRatio)
 
 class WelcomeDialog(QtWidgets.QDialog):
     def __init__(self):
@@ -50,12 +65,12 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.main_layout = QtWidgets.QVBoxLayout(self.central_widget)
         self.main_layout.setContentsMargins(10, 10, 10, 10)
 
-        self.video_widget = VideoWidget()
-        self.video_widget.setStyleSheet("background-color: black;")
+        self.video_widget = GraphicsVideoWidget()
+        self.video_widget.setStyleSheet("background-color: white;")
         self.main_layout.addWidget(self.video_widget, stretch=6)
 
         self.media_player = QtMultimedia.QMediaPlayer(None, QtMultimedia.QMediaPlayer.VideoSurface)
-        self.media_player.setVideoOutput(self.video_widget)
+        self.media_player.setVideoOutput(self.video_widget.video_item)
 
         self.slider = QtWidgets.QSlider(QtCore.Qt.Horizontal)
         self.slider.setRange(0, 0)
