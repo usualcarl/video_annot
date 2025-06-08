@@ -54,6 +54,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
     def __init__(self, csv_path, video_folder):
         super().__init__()
         self.setWindowTitle("Video Annotator")
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)  # Allow keyPressEvent to work after focus
         screen = QtWidgets.QApplication.primaryScreen().availableGeometry()
         self.resize(int(screen.width() * 0.8), int(screen.height() * 0.8))
 
@@ -66,7 +67,6 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.main_layout.setContentsMargins(10, 10, 10, 10)
 
         self.video_widget = GraphicsVideoWidget()
-        self.video_widget.setStyleSheet("background-color: white;")
         self.main_layout.addWidget(self.video_widget, stretch=6)
 
         self.media_player = QtMultimedia.QMediaPlayer(None, QtMultimedia.QMediaPlayer.VideoSurface)
@@ -91,6 +91,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.jump_number_input.setFocusPolicy(QtCore.Qt.ClickFocus)
         self.jump_number_input.returnPressed.connect(self.jump_to_video_number)
         self.main_layout.addWidget(self.jump_number_input)
+
         self.jump_input = QtWidgets.QLineEdit(self)
         self.jump_input.setPlaceholderText("Enter session_id to jump to video")
         self.jump_input.setFocusPolicy(QtCore.Qt.ClickFocus)
@@ -174,7 +175,6 @@ class VideoAnnotator(QtWidgets.QMainWindow):
             if row.get('status', '').strip() == "download_error":
                 self.current_index += 1
                 continue
-
             session_id = row['session_id']
             filename = f"{session_id}__alt_video.mp4"
             filepath = os.path.join(self.video_folder, filename)
@@ -281,27 +281,32 @@ class VideoAnnotator(QtWidgets.QMainWindow):
                 self.current_index = i
                 self.play_current_video()
                 self.jump_input.clearFocus()
+                self.setFocus()  # ensure keyPressEvent works
                 return
         QtWidgets.QMessageBox.warning(self, "Not Found", f"Session ID {session_id} not found.")
         self.jump_input.clearFocus()
+        self.setFocus()
 
     def jump_to_video_number(self):
         text = self.jump_number_input.text().strip()
         if not text.isdigit():
             QtWidgets.QMessageBox.warning(self, "Invalid Input", "Please enter a valid number.")
             self.jump_number_input.clearFocus()
+            self.setFocus()
             return
 
         number = int(text)
         if number < 1 or number > len(self.filtered_indices):
             QtWidgets.QMessageBox.warning(self, "Out of Range", f"Please enter a number between 1 and {len(self.filtered_indices)}.")
             self.jump_number_input.clearFocus()
+            self.setFocus()
             return
 
-        self.current_index = number - 1  
+        self.current_index = number - 1
         self.play_current_video()
-        self.jump_number_input.clearFocus()    
-    
+        self.jump_number_input.clearFocus()
+        self.setFocus()
+
     def duration_changed(self, duration):
         self.slider.setRange(0, duration)
 
