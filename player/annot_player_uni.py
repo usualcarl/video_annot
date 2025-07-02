@@ -148,10 +148,24 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.apply_filter()
 
     def load_csv(self):
-        with open(self.csv_path, newline='') as f:
-            reader = csv.DictReader(f)
-            self.fieldnames = reader.fieldnames
-            self.rows = list(reader)
+        encodings_to_try = ['utf-16', 'utf-8', 'utf-8-sig', 'windows-1252', 'latin1']
+        last_error = None
+
+        for encoding in encodings_to_try:
+            try:
+                with open(self.csv_path, newline='', encoding=encoding) as f:
+                    reader = csv.DictReader(f)
+                    self.fieldnames = reader.fieldnames
+                    self.rows = list(reader)
+                print(f"[INFO] CSV loaded successfully with encoding '{encoding}'. Rows loaded: {len(self.rows)}.")
+                return
+            except Exception as e:
+                last_error = e
+                print(f"[WARN] Failed to load CSV with encoding '{encoding}': {e}")
+
+        QtWidgets.QMessageBox.critical(self, "CSV Load Error",
+            f"Unable to read CSV file:\n{self.csv_path}\n\nLast error: {last_error}")
+        sys.exit()
 
     def save_csv(self):
         with open(self.csv_path, 'w', newline='') as f:
@@ -172,23 +186,28 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         while self.current_index < len(self.filtered_indices):
             real_index = self.filtered_indices[self.current_index]
             row = self.rows[real_index]
+            session_id = row['session_id'].strip()
+            filename = f"{session_id}__alt_video.mp4"
+            filepath = find_case_insensitive_file(self.video_folder, filename)
+
+            self.update_info_label()  
+
             if row.get('status', '').strip() == "download_error":
                 self.current_index += 1
                 continue
-            session_id = row['session_id']
-            filename = f"{session_id}__alt_video.mp4"
-            filepath = os.path.join(self.video_folder, filename)
-            if os.path.exists(filepath):
+
+            if filepath:
                 media = QtMultimedia.QMediaContent(QtCore.QUrl.fromLocalFile(filepath))
                 self.media_player.setMedia(media)
                 self.media_player.setPlaybackRate(self.playback_speed)
                 self.media_player.play()
                 self.play_pause_button.setText("Pause")
-                self.update_info_label()
                 return
             else:
+                print(f"[WARN] File not found (even case-insensitive): {filename}")
                 self.current_index += 1
 
+    
     def update_info_label(self):
         if self.filtered_indices:
             real_index = self.filtered_indices[self.current_index]
@@ -259,8 +278,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
     def check_video_end(self, status):
         if status == QtMultimedia.QMediaPlayer.EndOfMedia:
             if self.loop_enabled:
-                self.media_player.setPosition(0)
-                self.media_player.play()
+                self.play_current_video()
             else:
                 self.play_pause_button.setText("Play")
 
@@ -281,7 +299,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
                 self.current_index = i
                 self.play_current_video()
                 self.jump_input.clearFocus()
-                self.setFocus()  # ensure keyPressEvent works
+                self.setFocus()  
                 return
         QtWidgets.QMessageBox.warning(self, "Not Found", f"Session ID {session_id} not found.")
         self.jump_input.clearFocus()
@@ -319,6 +337,13 @@ class VideoAnnotator(QtWidgets.QMainWindow):
     def closeEvent(self, event):
         self.media_player.stop()
         super().closeEvent(event)
+
+def find_case_insensitive_file(folder, filename):
+    filename_lower = filename.lower()
+    for f in os.listdir(folder):
+        if f.lower() == filename_lower:
+            return os.path.join(folder, f)
+    return None
 
 def main():
     app = QtWidgets.QApplication(sys.argv)
