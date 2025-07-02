@@ -84,6 +84,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
         self.main_layout.addWidget(self.filter_combo)
 
         self.info_label = QtWidgets.QLabel(self)
+        self.info_label.setTextInteractionFlags(QtCore.Qt.TextSelectableByMouse)
         self.main_layout.addWidget(self.info_label)
 
         self.jump_number_input = QtWidgets.QLineEdit(self)
