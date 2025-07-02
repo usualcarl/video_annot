@@ -54,7 +54,7 @@ class VideoAnnotator(QtWidgets.QMainWindow):
     def __init__(self, csv_path, video_folder):
         super().__init__()
         self.setWindowTitle("Video Annotator")
-        self.setFocusPolicy(QtCore.Qt.StrongFocus)  # Allow keyPressEvent to work after focus
+        self.setFocusPolicy(QtCore.Qt.StrongFocus)  
         screen = QtWidgets.QApplication.primaryScreen().availableGeometry()
         self.resize(int(screen.width() * 0.8), int(screen.height() * 0.8))
 
